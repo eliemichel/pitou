@@ -11,7 +11,7 @@ import sqlite3
 debug = True
 
 chans = ['#courssysteme', '#b6']
-count = {c: 0 for c in chans}
+count = {}
 
 class IRCCat(ircbot.SimpleIRCClient):
 	def __init__(self, targets, db):
@@ -89,13 +89,19 @@ def install(db):
 def main():
 	server = "ulminfo.fr"
 	port = 6667
-	nickname = "nsfbot24"
+	nickname = "pitou"
 
 	db = sqlite3.connect('nsfbot.db')
 
 	if not check_install(db):
 		install(db)
-	
+
+	cur = db.cursor()
+	cur.execute("SELECT chan, SUM(count) FROM Word GROUP BY chan")
+	for c in cur.fetchall():
+		count[c[0]] = c[1]
+
+
 	c = IRCCat(chans, db)
 	try:
 		print('Connection...')
